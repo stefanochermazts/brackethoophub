@@ -10,8 +10,16 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'setlocale' => \App\Http\Middleware\SetLocale::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
+        
+        // Apply SetLocale middleware globally to web routes
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

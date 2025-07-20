@@ -78,11 +78,22 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'it'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => 'en',
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => 'it_IT',
+
+    'available_locales' => [
+        'it' => 'Italiano',
+        'en' => 'English',
+        'de' => 'Deutsch',
+        'fr' => 'Français',
+        'sr' => 'Српски',
+        'bs' => 'Bosanski',
+        'sl' => 'Slovenščina',
+        'hr' => 'Hrvatski',
+    ],
 
     /*
     |--------------------------------------------------------------------------
