@@ -55,6 +55,8 @@
         body {
             background: linear-gradient(135deg, var(--background-light) 0%, #f8fafc 100%);
             color: var(--text-light);
+            height: 100vh;
+            overflow-x: hidden;
         }
 
         .dark body {
@@ -62,10 +64,23 @@
             color: var(--text-light);
         }
 
+        .admin-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
         .sidebar {
             background: linear-gradient(180deg, var(--secondary-color) 0%, #1e293b 100%);
             border-right: 1px solid var(--border-light);
             transition: all 0.3s ease;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
         }
 
         .dark .sidebar {
@@ -82,6 +97,9 @@
 
         .main-content {
             transition: margin-left 0.3s ease;
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .main-content-expanded {
@@ -96,6 +114,9 @@
             transition: all 0.2s ease;
             border-radius: 0.5rem;
             margin: 0.25rem 0.5rem;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
         }
 
         .nav-item:hover {
@@ -106,6 +127,28 @@
         .nav-item.active {
             background: var(--primary-color);
             color: white;
+        }
+
+        .nav-icon {
+            flex-shrink: 0;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .nav-text {
+            transition: opacity 0.3s ease;
+            margin-left: 0.75rem;
+        }
+
+        .sidebar-collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-expanded .nav-text {
+            opacity: 1;
+            width: auto;
         }
 
         .card {
@@ -163,77 +206,114 @@
             border-radius: 0.5rem;
             padding: 0.5rem;
             transition: all 0.2s ease;
+            flex-shrink: 0;
         }
 
         .toggle-sidebar:hover {
             background: var(--primary-dark);
             transform: scale(1.05);
         }
+
+        .sidebar-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-collapsed .user-info {
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-expanded .user-info {
+            opacity: 1;
+            height: auto;
+        }
     </style>
 </head>
 <body class="h-full font-sans antialiased">
-    <div class="min-h-screen flex">
+    <div class="admin-container">
         <!-- Sidebar -->
-        <div id="sidebar" class="sidebar sidebar-expanded fixed h-full z-50">
-            <div class="flex flex-col h-full">
-                <!-- Header -->
-                <div class="flex items-center justify-between p-4 border-b border-gray-700">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM6 8a4 4 0 118 0 4 4 0 01-8 0z"/>
-                            </svg>
-                        </div>
-                        <span id="sidebar-title" class="text-white font-semibold text-lg">Admin Panel</span>
+        <div id="sidebar" class="sidebar sidebar-expanded">
+            <!-- Header -->
+            <div class="sidebar-header">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM6 8a4 4 0 118 0 4 4 0 01-8 0z"/>
+                        </svg>
                     </div>
-                    <button id="toggle-sidebar" class="toggle-sidebar">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                    </button>
+                    <span id="sidebar-title" class="text-white font-semibold text-lg">Admin Panel</span>
                 </div>
+                <button id="toggle-sidebar" class="toggle-sidebar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
 
-                <!-- Navigation -->
-                <nav class="flex-1 p-4 space-y-2">
-                    <a href="{{ route('admin.dashboard') }}" class="nav-item flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
-                        </svg>
-                        <span id="nav-dashboard">Dashboard</span>
-                    </a>
+            <!-- Navigation -->
+            <nav class="sidebar-nav space-y-2">
+                <a href="{{ route('admin.dashboard') }}" class="nav-item px-3 py-2 text-gray-300 hover:text-white {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+                    </svg>
+                    <span class="nav-text">Dashboard</span>
+                </a>
 
-                    <a href="{{ route('admin.users') }}" class="nav-item flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white {{ request()->routeIs('admin.users') ? 'active' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
-                        </svg>
-                        <span id="nav-users">Utenti</span>
-                    </a>
+                <a href="{{ route('admin.users') }}" class="nav-item px-3 py-2 text-gray-300 hover:text-white {{ request()->routeIs('admin.users') ? 'active' : '' }}">
+                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                    </svg>
+                    <span class="nav-text">Utenti</span>
+                </a>
 
-                    <a href="{{ route('admin.tournaments') }}" class="nav-item flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white {{ request()->routeIs('admin.tournaments') ? 'active' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <span id="nav-tournaments">Tornei</span>
-                    </a>
+                <a href="{{ route('admin.tournaments') }}" class="nav-item px-3 py-2 text-gray-300 hover:text-white {{ request()->routeIs('admin.tournaments') ? 'active' : '' }}">
+                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <span class="nav-text">Tornei</span>
+                </a>
 
-                    <a href="{{ route('admin.settings') }}" class="nav-item flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        <span id="nav-settings">Impostazioni</span>
-                    </a>
-                </nav>
+                <a href="{{ route('admin.settings') }}" class="nav-item px-3 py-2 text-gray-300 hover:text-white {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
+                    <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span class="nav-text">Impostazioni</span>
+                </a>
+            </nav>
 
-                <!-- User Info -->
-                <div class="p-4 border-t border-gray-700">
+            <!-- User Info -->
+            <div class="sidebar-footer">
+                <div class="user-info">
                     <div class="flex items-center space-x-3">
                         <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
                             <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                             </svg>
                         </div>
-                        <div id="user-info" class="flex-1">
+                        <div class="flex-1">
                             <div class="text-white text-sm font-medium">{{ Auth::user()->name }}</div>
                             <div class="text-gray-400 text-xs">{{ Auth::user()->email }}</div>
                         </div>
@@ -249,7 +329,7 @@
         </div>
 
         <!-- Main Content -->
-        <div id="main-content" class="main-content main-content-expanded flex-1">
+        <div id="main-content" class="main-content main-content-expanded">
             <!-- Top Bar -->
             <div class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
                 <div class="flex items-center justify-between">
@@ -290,23 +370,12 @@
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('main-content');
         const toggleBtn = document.getElementById('toggle-sidebar');
-        const sidebarTitle = document.getElementById('sidebar-title');
-        const navTexts = document.querySelectorAll('#nav-dashboard, #nav-users, #nav-tournaments, #nav-settings');
-        const userInfo = document.getElementById('user-info');
 
         toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('sidebar-collapsed');
             sidebar.classList.toggle('sidebar-expanded');
             mainContent.classList.toggle('main-content-collapsed');
             mainContent.classList.toggle('main-content-expanded');
-            
-            // Toggle text visibility
-            const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
-            sidebarTitle.style.display = isCollapsed ? 'none' : 'block';
-            navTexts.forEach(text => {
-                text.style.display = isCollapsed ? 'none' : 'block';
-            });
-            userInfo.style.display = isCollapsed ? 'none' : 'block';
         });
 
         // Theme Toggle
