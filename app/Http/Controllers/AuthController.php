@@ -39,6 +39,8 @@ class AuthController extends Controller
             // Redirect based on user role
             if (Auth::user()->role === 'admin') {
                 return redirect()->intended(route('admin.dashboard'));
+            } elseif (Auth::user()->role === 'organizer') {
+                return redirect()->intended(route('admin.dashboard')); // Organizers can access admin area
             }
 
             return redirect()->intended(route('home'));
@@ -72,7 +74,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Default role
+            'role' => 'organizer', // Default role for new registrations
         ]);
 
         Auth::login($user);

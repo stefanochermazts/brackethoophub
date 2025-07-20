@@ -21,8 +21,10 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        // Create some regular users
-        User::factory(10)->create();
+        // Create some regular users (organizers)
+        User::factory(10)->create([
+            'role' => 'organizer'
+        ]);
 
         // Seed settings
         $this->call(SettingsSeeder::class);

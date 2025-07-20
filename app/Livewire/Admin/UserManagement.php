@@ -14,8 +14,10 @@ class UserManagement extends Component
     use WithPagination;
 
     public $search = '';
+    public $roleFilter = '';
     public $showModal = false;
-    public $editingUser = null;
+    public $editing = false;
+    public $userId = null;
     public $name = '';
     public $email = '';
     public $role = 'user';
@@ -25,114 +27,94 @@ class UserManagement extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
-        'role' => 'required|in:user,admin',
+        'role' => 'required|in:user,admin,organizer',
         'password' => 'nullable|min:8|confirmed',
     ];
 
     public function render()
     {
-        $users = User::query()
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('email', 'like', '%' . $this->search . '%');
-                });
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = User::query();
 
-        return view('livewire.admin.user-management', [
-            'users' => $users
-        ]);
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('email', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        if ($this->roleFilter) {
+            $query->where('role', $this->roleFilter);
+        }
+
+        $users = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('livewire.admin.user-management', compact('users'));
     }
 
-    public function createUser()
+    public function showCreateModal()
     {
         $this->resetForm();
         $this->showModal = true;
+        $this->editing = false;
     }
 
-    public function editUser(User $user)
+    public function edit($userId)
     {
-        $this->editingUser = $user;
+        $user = User::findOrFail($userId);
+        $this->userId = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
         $this->role = $user->role;
         $this->password = '';
         $this->password_confirmation = '';
         $this->showModal = true;
+        $this->editing = true;
     }
 
-    public function saveUser()
+    public function save()
     {
         $this->validate();
 
-        $userData = [
-            'name' => $this->name,
-            'email' => $this->email,
-            'role' => $this->role,
-        ];
-
-        // Se stiamo modificando un utente esistente
-        if ($this->editingUser) {
-            // Verifica che l'email sia unica (escludendo l'utente corrente)
-            $this->validate([
-                'email' => 'required|email|max:255|unique:users,email,' . $this->editingUser->id,
+        if ($this->editing) {
+            $user = User::findOrFail($this->userId);
+            $user->update([
+                'name' => $this->name,
+                'email' => $this->email,
+                'role' => $this->role,
             ]);
 
-            $this->editingUser->update($userData);
-
-            // Aggiorna la password solo se fornita
             if ($this->password) {
-                $this->editingUser->update([
-                    'password' => Hash::make($this->password)
-                ]);
+                $user->update(['password' => Hash::make($this->password)]);
             }
 
-            session()->flash('message', 'Utente aggiornato con successo.');
+            session()->flash('message', 'Utente aggiornato con successo!');
         } else {
-            // Verifica che l'email sia unica per nuovi utenti
-            $this->validate([
-                'email' => 'required|email|max:255|unique:users,email',
-                'password' => 'required|min:8|confirmed',
+            User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'role' => $this->role,
+                'password' => Hash::make($this->password),
             ]);
 
-            $userData['password'] = Hash::make($this->password);
-            User::create($userData);
-
-            session()->flash('message', 'Utente creato con successo.');
+            session()->flash('message', 'Utente creato con successo!');
         }
 
         $this->closeModal();
         $this->resetPage();
     }
 
-    public function deleteUser(User $user)
+    public function delete($userId)
     {
-        // Impedisci di eliminare se stessi
+        $user = User::findOrFail($userId);
+        
         if ($user->id === auth()->id()) {
-            session()->flash('error', 'Non puoi eliminare il tuo account.');
+            session()->flash('error', 'Non puoi eliminare il tuo account!');
             return;
         }
 
         $user->delete();
-        session()->flash('message', 'Utente eliminato con successo.');
+        session()->flash('message', 'Utente eliminato con successo!');
         $this->resetPage();
-    }
-
-    public function toggleUserStatus(User $user)
-    {
-        // Impedisci di disabilitare se stessi
-        if ($user->id === auth()->id()) {
-            session()->flash('error', 'Non puoi modificare il tuo account.');
-            return;
-        }
-
-        $user->update([
-            'email_verified_at' => $user->email_verified_at ? null : now()
-        ]);
-
-        session()->flash('message', 'Stato utente aggiornato con successo.');
     }
 
     public function closeModal()
@@ -143,7 +125,7 @@ class UserManagement extends Component
 
     private function resetForm()
     {
-        $this->editingUser = null;
+        $this->userId = null;
         $this->name = '';
         $this->email = '';
         $this->role = 'user';
@@ -153,6 +135,11 @@ class UserManagement extends Component
     }
 
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingRoleFilter()
     {
         $this->resetPage();
     }

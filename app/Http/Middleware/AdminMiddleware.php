@@ -13,8 +13,8 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || Auth::user()->role !== 'admin') {
-            abort(403, 'Accesso negato. Area riservata agli amministratori.');
+        if (!Auth::check() || !in_array(Auth::user()->role, ['admin', 'organizer'])) {
+            abort(403, 'Accesso negato. Area riservata agli amministratori e organizzatori.');
         }
         return $next($request);
     }
