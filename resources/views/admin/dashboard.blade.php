@@ -1,27 +1,27 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard Amministrativa')
+@section('title', auth()->user()->isAdmin() ? __('admin.administrative_dashboard') : __('admin.organizer_dashboard'))
 
 @section('content')
 <div class="space-y-6">
     <!-- Welcome Section -->
     <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Dashboard Amministrativa
+        <h1 class="text-4xl font-bold text-primary mb-4">
+            {{ auth()->user()->isAdmin() ? __('admin.administrative_dashboard') : __('admin.organizer_dashboard') }}
         </h1>
-        <p class="text-lg text-gray-600 dark:text-gray-400">
-            Benvenuto nel pannello di amministrazione di Basketball Hub
+        <p class="text-lg text-secondary">
+            {{ auth()->user()->isAdmin() ? __('admin.welcome_admin') : __('admin.welcome_organizer') }}
         </p>
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <!-- Total Users -->
         <div class="stat-card group">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Utenti Totali</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $totalUsers }}</p>
+                    <p class="text-sm font-medium text-secondary">{{ __('admin.total_users') }}</p>
+                    <p class="text-3xl font-bold text-primary">{{ $totalUsers }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,12 +31,13 @@
             </div>
         </div>
 
+        @if(auth()->user()->isAdmin())
         <!-- Administrators -->
         <div class="stat-card group">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Amministratori</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $adminUsers }}</p>
+                    <p class="text-sm font-medium text-secondary">{{ __('admin.administrators') }}</p>
+                    <p class="text-3xl font-bold text-primary">{{ $adminUsers }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,8 +51,8 @@
         <div class="stat-card group">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Organizzatori</p>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ $organizerUsers }}</p>
+                    <p class="text-sm font-medium text-secondary">{{ __('admin.organizers') }}</p>
+                    <p class="text-3xl font-bold text-primary">{{ $organizerUsers }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,15 +61,61 @@
                 </div>
             </div>
         </div>
+        @endif
+
+        <!-- Companies -->
+        <div class="stat-card group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-secondary">{{ __('admin.companies') }}</p>
+                    <p class="text-3xl font-bold text-primary">{{ $companyUsers }}</p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coaches -->
+        <div class="stat-card group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-secondary">{{ __('admin.coaches') }}</p>
+                    <p class="text-3xl font-bold text-primary">{{ $coachUsers }}</p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Players -->
+        <div class="stat-card group">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-secondary">{{ __('admin.players') }}</p>
+                    <p class="text-3xl font-bold text-primary">{{ $playerUsers }}</p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="space-y-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Azioni Rapide</h2>
+        <h2 class="text-2xl font-bold text-primary">{{ __('admin.quick_actions') }}</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 {{ auth()->user()->isAdmin() ? 'md:grid-cols-3' : 'md:grid-cols-2' }} gap-6">
             <!-- Add User -->
-            <a href="{{ route('admin.users') }}" class="card p-6 hover:shadow-lg transition-all duration-300 group">
+            <a href="{{ route('admin.users') }}" class="stat-card p-6 hover:shadow-lg transition-all duration-300 group">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,16 +123,22 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-orange-500 transition-colors">
-                            Aggiungi Utente
+                        <h3 class="text-lg font-semibold text-primary group-hover:text-orange-500 transition-colors">
+                            {{ __('admin.add_user') }}
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-400">Crea un nuovo account utente</p>
+                        <p class="text-secondary">
+                            @if(auth()->user()->isAdmin())
+                                {{ __('admin.create_new_account') }}
+                            @else
+                                {{ __('admin.create_company_coach_player') }}
+                            @endif
+                        </p>
                     </div>
                 </div>
             </a>
 
             <!-- Manage Tournaments -->
-            <a href="{{ route('admin.tournaments') }}" class="card p-6 hover:shadow-lg transition-all duration-300 group">
+            <a href="{{ route('admin.tournaments.index') }}" class="stat-card p-6 hover:shadow-lg transition-all duration-300 group">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,16 +146,17 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-orange-500 transition-colors">
-                            Gestisci Tornei
+                        <h3 class="text-lg font-semibold text-primary group-hover:text-orange-500 transition-colors">
+                            {{ __('admin.manage_tournaments') }}
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-400">Visualizza e modifica i tornei</p>
+                        <p class="text-secondary">{{ __('admin.view_modify_tournaments') }}</p>
                     </div>
                 </div>
             </a>
 
-            <!-- Settings -->
-            <a href="{{ route('admin.settings') }}" class="card p-6 hover:shadow-lg transition-all duration-300 group">
+            <!-- Settings (Only for Admin) -->
+            @if(auth()->user()->isAdmin())
+            <a href="{{ route('admin.settings') }}" class="stat-card p-6 hover:shadow-lg transition-all duration-300 group">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,41 +165,45 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-orange-500 transition-colors">
-                            Impostazioni
+                        <h3 class="text-lg font-semibold text-primary group-hover:text-orange-500 transition-colors">
+                            {{ __('admin.settings') }}
                         </h3>
-                        <p class="text-gray-600 dark:text-gray-400">Configura la piattaforma</p>
+                        <p class="text-secondary">{{ __('admin.configure_platform') }}</p>
                     </div>
                 </div>
             </a>
+            @endif
         </div>
     </div>
 
     <!-- Recent Activity -->
     <div class="mt-8">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Attività Recenti</h2>
-        <div class="card p-6">
+        <h2 class="text-2xl font-bold text-primary mb-4">{{ __('admin.recent_activity') }}</h2>
+        <div class="stat-card p-6">
             <div class="space-y-4">
                 @if($recentUsers->count() > 0)
                     @foreach($recentUsers as $user)
-                    <div class="flex items-center space-x-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                    <div class="flex items-center space-x-4 activity-item">
                         <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->name }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
+                            <p class="text-sm font-medium text-primary">{{ $user->name }}</p>
+                            <p class="text-xs text-secondary">{{ $user->email }}</p>
                         </div>
                         <div class="text-right">
                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                {{ $user->role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 
-                                   ($user->role === 'organizer' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 
-                                   'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200') }}">
-                                {{ $user->role === 'admin' ? 'Admin' : ($user->role === 'organizer' ? 'Organizzatore' : 'Utente') }}
+                                {{ $user->role === 'admin' ? 'role-admin' : 
+                                   ($user->role === 'organizer' ? 'role-organizer' : 
+                                   ($user->role === 'company' ? 'role-company' :
+                                   ($user->role === 'coach' ? 'role-coach' :
+                                   ($user->role === 'player' ? 'role-player' :
+                                   'role-default')))) }}">
+                                {{ $user->getRoleDisplayName() }}
                             </span>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <p class="text-xs text-secondary mt-1">
                                 {{ $user->created_at->diffForHumans() }}
                             </p>
                         </div>
@@ -153,10 +211,10 @@
                     @endforeach
                 @else
                     <div class="text-center py-8">
-                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-12 h-12 text-muted mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        <p class="text-gray-500 dark:text-gray-400">Nessuna attività recente</p>
+                        <p class="text-secondary">Nessuna attività recente</p>
                     </div>
                 @endif
             </div>

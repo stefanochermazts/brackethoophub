@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,20 +11,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a default admin user
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@brackethoophub.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
+        $this->call([
+            UserSeeder::class,
+            SettingsSeeder::class,
         ]);
-
-        // Create some regular users (organizers)
-        User::factory(10)->create([
-            'role' => 'organizer'
-        ]);
-
-        // Seed settings
-        $this->call(SettingsSeeder::class);
     }
 }
